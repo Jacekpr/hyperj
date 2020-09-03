@@ -1,2 +1,0 @@
-Installed chaincodes on peer:
-Package ID: hashes_1:0ed34f172ddb27a05218d26b6999498cb9476c86b2d445f800fa3ce31ee1008f, Label: hashes_1
