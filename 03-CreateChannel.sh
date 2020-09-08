@@ -44,22 +44,22 @@ joinChannel(){
     setGlobalsForPeer0Org1
     ./bin/peer channel join -b ./artifacts/$CHANNEL_NAME.block  
 
-    # setGlobalsForPeer0Org2
-    # ./bin/peer channel join -b ./channel-artifacts/$CHANNEL_NAME.block
+    setGlobalsForPeer0Org2
+    ./bin/peer channel join -b ./artifacts/$CHANNEL_NAME.block
 
-    # setGlobalsForPeer0Org3
-    # ./bin/peer channel join -b ./channel-artifacts/$CHANNEL_NAME.block
+    setGlobalsForPeer0Org3
+    ./bin/peer channel join -b ./artifacts/$CHANNEL_NAME.block
 }
 
 updateAnchorPeers(){
     setGlobalsForPeer0Org1
     ./bin/peer channel update -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com -c $CHANNEL_NAME -f ./artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA
 
-    # setGlobalsForPeer0Org2
-    # ./bin/peer channel update -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com -c $CHANNEL_NAME -f ./artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA
+    setGlobalsForPeer0Org2
+    ./bin/peer channel update -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com -c $CHANNEL_NAME -f ./artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA
 
-    # setGlobalsForPeer0Org3
-    # ./bin/peer channel update -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com -c $CHANNEL_NAME -f ./artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA
+    setGlobalsForPeer0Org3
+    ./bin/peer channel update -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com -c $CHANNEL_NAME -f ./artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA
 }
 
 createChannel

@@ -52,13 +52,21 @@ packageChaincode(){
 
 installChaincode(){
     setGlobalsForPeer0Org1
-    ./bin/peer lifecycle chaincode install ${CC_NAME}.tar.gz
-    echo "===================== Chaincode is installed on peer0.org1 ===================== "    
+    peer lifecycle chaincode install ${CC_NAME}.tar.gz
+    echo "===================== Chaincode is installed on peer0.org1 ===================== "
+
+    setGlobalsForPeer0Org2
+    peer lifecycle chaincode install ${CC_NAME}.tar.gz
+    echo "===================== Chaincode is installed on peer0.org2 ===================== "    
+
+    setGlobalsForPeer0Org3
+    peer lifecycle chaincode install ${CC_NAME}.tar.gz
+    echo "===================== Chaincode is installed on peer0.org3 ===================== "    
 }
 
 queryInstalled(){
     setGlobalsForPeer0Org1
-    ./bin/peer lifecycle chaincode queryinstalled >&log.txt
+    peer lifecycle chaincode queryinstalled >&log.txt
     cat log.txt
     PACKAGE_ID=$(sed -n "/${CC_NAME}_${VERSION}/{s/^Package ID: //; s/, Label:.*$//; p;}" log.txt)
     echo PackageID is ${PACKAGE_ID}
@@ -68,7 +76,7 @@ queryInstalled(){
 approveForMyOrg1(){
     setGlobalsForPeer0Org1
 
-    ./bin/peer lifecycle chaincode approveformyorg -o localhost:7050  \
+    peer lifecycle chaincode approveformyorg -o localhost:7050  \
     --ordererTLSHostnameOverride orderer.example.com --tls $CORE_PEER_TLS_ENABLED \
     --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name ${CC_NAME} --version ${VERSION} \
     --init-required --package-id ${PACKAGE_ID} --sequence ${VERSION}
@@ -80,7 +88,7 @@ approveForMyOrg1(){
 approveForMyOrg2(){
     setGlobalsForPeer0Org2
 
-    ./bin/peer lifecycle chaincode approveformyorg -o localhost:7050  \
+    peer lifecycle chaincode approveformyorg -o localhost:7050  \
     --ordererTLSHostnameOverride orderer.example.com --tls $CORE_PEER_TLS_ENABLED \
     --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name ${CC_NAME} --version ${VERSION} \
     --init-required --package-id ${PACKAGE_ID} --sequence ${VERSION}
@@ -92,7 +100,7 @@ approveForMyOrg2(){
 approveForMyOrg3(){
     setGlobalsForPeer0Org3
 
-    ./bin/peer lifecycle chaincode approveformyorg -o localhost:7050  \
+    peer lifecycle chaincode approveformyorg -o localhost:7050  \
     --ordererTLSHostnameOverride orderer.example.com --tls $CORE_PEER_TLS_ENABLED \
     --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name ${CC_NAME} --version ${VERSION} \
     --init-required --package-id ${PACKAGE_ID} --sequence ${VERSION}
@@ -104,7 +112,7 @@ approveForMyOrg3(){
 
 checkCommitReadyness(){
     setGlobalsForPeer0Org1
-    ./bin/peer lifecycle chaincode checkcommitreadiness \
+    peer lifecycle chaincode checkcommitreadiness \
     --channelID $CHANNEL_NAME --name ${CC_NAME} --version ${VERSION} \
     --sequence ${VERSION} --output json --init-required
     echo "===================== checking commit readyness from org 1 ===================== "
@@ -113,7 +121,14 @@ checkCommitReadyness(){
 commitChaincodeDefination(){
     setGlobalsForPeer0Org1
     set -x
-    ./bin/peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls $CORE_PEER_TLS_ENABLED  --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name ${CC_NAME} --peerAddresses localhost:7051 --tlsRootCertFiles $PEER0_ORG1_CA --version ${VERSION} --sequence ${VERSION} --init-required
+    peer lifecycle chaincode commit -o localhost:7050 \
+        --ordererTLSHostnameOverride orderer.example.com \
+        --tls $CORE_PEER_TLS_ENABLED  --cafile $ORDERER_CA \
+        --channelID $CHANNEL_NAME --name ${CC_NAME} \
+        --peerAddresses localhost:7051 --tlsRootCertFiles $PEER0_ORG1_CA \
+        --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA \
+        --peerAddresses localhost:11051 --tlsRootCertFiles $PEER0_ORG3_CA \
+        --version ${VERSION} --sequence ${VERSION} --init-required
     set +x
    
 }
@@ -126,7 +141,14 @@ queryCommitted(){
 
 chaincodeInvokeInit(){
     setGlobalsForPeer0Org1
-    ./bin/peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n ${CC_NAME} --peerAddresses localhost:7051 --tlsRootCertFiles $PEER0_ORG1_CA --isInit -c '{"function":"InitLedger","Args":[]}'
+    ./bin/peer chaincode invoke -o localhost:7050 \
+    --ordererTLSHostnameOverride orderer.example.com \
+    --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA \
+    -C $CHANNEL_NAME -n ${CC_NAME} \
+    --peerAddresses localhost:7051 --tlsRootCertFiles $PEER0_ORG1_CA \
+    --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA \
+    --peerAddresses localhost:11051 --tlsRootCertFiles $PEER0_ORG3_CA \
+    --isInit -c '{"function":"InitLedger","Args":[]}'
 }
 
 
@@ -145,6 +167,6 @@ approveForMyOrg3
 checkCommitReadyness
 commitChaincodeDefination
 queryCommitted
-chaincodeInvokeInit
+ chaincodeInvokeInit
 sleep 5
 chaincodeQuery
